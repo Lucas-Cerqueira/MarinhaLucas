@@ -40,6 +40,27 @@ else
     load(sprintf('%s/LofarData.mat',datapath));
 end
 
+%Create a text file to store the training history or append new info to it
+trainHistoryPath = sprintf ('%s/trainHistory.txt', outputpath);
+if exist (trainHistoryPath, 'file') == 2
+    historyFile = fopen (trainHistoryPath, 'a');
+else
+    historyFile = fopen (trainHistoryPath, 'w');
+end
+if develop_mode == 1
+    devModeStr = 'true';
+else
+    devModeStr = 'false';
+end
+fprintf (historyFile, '%s#%i#%i#%s\n', datestr (datetime ('now')), n_folds, n_init, devModeStr);
+fclose (historyFile);
+
+%Create a folder to store data about the training
+trainFolderPath = sprintf ('%s/%s', outputpath, datestr (datetime ('now')));
+mkdir (sprintf ('%s/mat', trainFolderPath));
+mkdir (sprintf ('%s/pict', trainFolderPath));
+disp ('Rodou')
+
 data2train = [];
 target2train = [];
 target2train_norm = [];
@@ -60,24 +81,28 @@ end
 
 CVO = cvpartition(target2train,'Kfold',n_folds);
 
-possible_topo = 2:3;
+possible_topo = 2;
 
 % training parameters
 train_fnc = 'trainlm'; % weights update function
 perf_fnc = 'mse'; % error function
 act_fnc = {'tansig' 'tansig'}; % activation function
-n_epochs = 200;
+%n_epochs = 200;
+n_epochs = 5;
 show = true;
 normalization = 'mapstd';
 
-save(sprintf('%s/TrainInformationNN.mat',outputpath),'possible_topo','train_fnc','perf_fnc','act_fnc','n_epochs','normalization','CVO');
+% ******
+save(sprintf('%s/TrainInformationNN.mat', trainFolderPath),'possible_topo','train_fnc','perf_fnc','act_fnc','n_epochs','normalization','CVO');
 
 
 % Parallel Processing
-if matlabpool('size') == 0 % checking to see if my pool is already open
-    matlabpool close force local
-    matlabpool open local 4 
-end
+% if parpool('local') == 0 % checking to see if my pool is already open
+%     parpool close force local
+%     parpool open local 4 
+% end
+
+poolobj = parpool ('local', 2)
 
 for topo = 1:length(possible_topo)
     fprintf('Topo: %i - Perform NN Train\n', possible_topo(topo));
@@ -85,7 +110,7 @@ for topo = 1:length(possible_topo)
         if (develop_mode) && (ifolds > 2), continue; end
         trn_id =  CVO.training(ifolds);
         tst_id =  CVO.test(ifolds);
-        
+       
         itrn = []; itst = [];
         for i = 1:length(data2train)
             if trn_id(i) == 1
@@ -114,11 +139,14 @@ for topo = 1:length(possible_topo)
             fprintf('Topo: %i - iFold: %i of %i - Init: %i of %i\n',possible_topo(topo), ifolds, n_folds, i_init, n_init);
             [trained_nn{i_init}, train_description{i_init}] = train_neural_network(data_norm, target2train_norm, itrn, ival, itst, possible_topo(topo), train_fnc, perf_fnc, act_fnc, n_epochs, show);
         end
-        save(sprintf('%s/mat/RunNNTrainCV_topo_%02i_fold_%02i.mat',outputpath,possible_topo(topo),ifolds),'trained_nn','train_description');
+	% ***********
+        save(sprintf('%s/mat/RunNNTrainCV_topo_%02i_fold_%02i.mat', trainFolderPath,possible_topo(topo),ifolds),'trained_nn','train_description');
     end
 end
 
-if matlabpool('size') ~= 0 % checking to see if my pool is already open
-    %matlabpool close
-    matlabpool close force local
-end
+delete (poolobj);
+
+% if parpool('local') ~= 0 % checking to see if my pool is already open
+%     %parpool close
+%     parpool close force local
+% end

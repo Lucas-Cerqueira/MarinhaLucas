@@ -16,7 +16,10 @@
 
 #export OUTPUTDATAPATH=$MARINHA_WORKSPACE/Results
 
-source setup.sh
+
+DIR=$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+DIR+="/setup.sh"
+source $DIR 
 
 # Folder Configuration
 if [ -d "$OUTPUTDATAPATH" ]; then
@@ -25,8 +28,22 @@ if [ -d "$OUTPUTDATAPATH" ]; then
         echo "creating OUTPUTDATAPATH struct"
         rm -rf $OUTPUTDATAPATH
         mkdir $OUTPUTDATAPATH
-        cd $MARINHA_WORKSPACE/Packages
-        for i in $(ls -d */); do mkdir $OUTPUTDATAPATH/${i%%/}; done
+        cd $MARINHA_WORKSPACE/Packages 
+        for i in $(ls -d */)
+        do 
+             mkdir $OUTPUTDATAPATH/${i%%/}
+        done 
+#        for i in $(ls -d */)                          It is an alternative way, creating all possible subfolders in Results folder
+#        do
+#          mkdir $OUTPUTDATAPATH/${i%%/}
+#          cd $MARINHA_WORKSPACE/Packages/$i
+#          for j in $(ls -d */)
+#          do
+#            if [ "$j" != "functions/" -a "$j" != "scripts/" ]; then
+#              mkdir $OUTPUTDATAPATH/$i/${j%%}
+#            fi
+#          done
+#        done
         cd $MARINHA_WORKSPACE
     fi
 else
@@ -35,7 +52,21 @@ else
     rm -rf $OUTPUTDATAPATH
     mkdir $OUTPUTDATAPATH
     cd $MARINHA_WORKSPACE/Packages
-    for i in $(ls -d */); do mkdir $OUTPUTDATAPATH/${i%%/}; done
+    for i in $(ls -d */)
+    do 
+          mkdir $OUTPUTDATAPATH/${i%%/}
+    done 
+#   for i in $(ls -d */)                          It is an alternative way, creating all possible subfolders in Results folder
+#   do
+#     mkdir $OUTPUTDATAPATH/${i%%/}
+#     cd $MARINHA_WORKSPACE/Packages/$i
+#     for j in $(ls -d */)
+#     do
+#       if [ "$j" != "functions/" -a "$j" != "scripts/" ]; then
+#         mkdir $OUTPUTDATAPATH/$i/${j%%}
+#       fi
+#     done
+#   done
     cd $MARINHA_WORKSPACE
 fi
 

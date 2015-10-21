@@ -1,8 +1,7 @@
 clear all
 clc
-close all
+close allO
 
-
-
-file = fopen ('runs.txt', 'w')
-fprintf (file, '
+% file = fopen ('runs.txt', 'w');
+% fprintf (file, 'data-hora:initi:folds:y/n');
+% fclose (file);

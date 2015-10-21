@@ -10,6 +10,7 @@ clc;
 
 fprintf('Starting %s.m\n',mfilename('fullpath'));
 
+%system ('source /home/lucas/Documents/IC/MarinhaLucas/scripts/setup.sh');
 
 % System var. point to external folders
 inputpath = getenv('INPUTDATAPATH');
@@ -90,7 +91,7 @@ save(sprintf('%s/RawData.mat',outputpath),'fs','data','rundata','class_labels');
 
 % all machine learning proccess with same number of data
 n_folds = 10;
-n_init = 10;
+n_init = 2;
 develop_mode = develop;
 
 save(sprintf('%s/TrainInformation.mat',outputpath),'develop_mode','n_folds','n_init');

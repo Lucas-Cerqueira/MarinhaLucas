@@ -43,6 +43,7 @@ end
 n_pts_fft = 0;
 n_pts_fft = input(sprintf('Number of FFT Points [default: 1024]: '));
 
+
 if n_pts_fft == 0
     n_pts_fft = 1024;
 end
@@ -98,8 +99,10 @@ for iclass = 1:numel(class_labels) % All Classes
     h = [];
     if show_plot
         h = figure('visible','on');
+        colormap jet;
     else
         h = figure('visible','off');
+        colormap jet;
     end
     
     imagesc(f(1:spectrum_bins_left),t,data_lofar.(class_labels{iclass})');
@@ -139,6 +142,7 @@ for iclass = 1:numel(class_labels) % All Classes
         rundata_lofar.(class_labels{iclass}){irun} = intensity(1:400,:); % William
         
         h = figure('visible','off');
+        colormap jet;
         imagesc(f,t,intensity');
         
         if decimation_rate >=1

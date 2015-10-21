@@ -12,7 +12,10 @@
 #    export MARINHA_WORKSPACE=/Users/natmourajr/Workspace/Doutorado/Marinha
 #fi
 
-source setup.sh
+DIR=$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+DIR+="/setup.sh"
+source $DIR
+
 
 cd $MARINHA_WORKSPACE
 rm -Rrf *~
