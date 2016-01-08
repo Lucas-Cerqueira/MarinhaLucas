@@ -96,19 +96,22 @@ for novelty_class = 1:numel(class_labels) % todas as classes
     topos = [[size(data2train,1) 200 100];
              [size(data2train,1) 100 25];
              [size(data2train,1) 40 4]];
+         
+    
+    topos = [size(data2train,1) 40 4];
 
     save(sprintf('%s/TrainInformationDNN_novelty_%s.mat',outputpath,class_labels{novelty_class}),'data2train','target2train','target2train_norm','nn_epochs','rbm_epochs','normalization','CVO', 'classificationTraining','keepAEWeights','topos');
 end
 
 
-for novelty_class = 1:numel(class_labels) % todas as classes
+for novelty_class = 1%:numel(class_labels) % todas as classes
     fprintf('Novelty Class: %s\n',class_labels{novelty_class});
     fprintf('DNN Train Procedure\n');
     
     load(sprintf('%s/TrainInformationDNN_novelty_%s.mat',outputpath,class_labels{novelty_class}));
     
     
-    for ifolds = 1:n_folds
+    for ifolds = 1%:n_folds
         if (develop_mode) && (ifolds > 2), continue; end
         trn_id =  CVO.training(ifolds);
         tst_id =  CVO.test(ifolds);
@@ -134,7 +137,7 @@ for novelty_class = 1:numel(class_labels) % todas as classes
             data_norm = mapminmax('apply', data2train ,norm_fact);
         end 
         
-        for indexTopo=1:size(topos,2)
+        for indexTopo=1%:size(topos,2)
         
             %Train a DNN
             sae = saesetup(topos(indexTopo,:));
@@ -206,7 +209,7 @@ for novelty_class = 1:numel(class_labels) % todas as classes
                 %save (sprintf('%s/mat/RunDNNTrainCV_BeforeTraining_NN-Representation_novelty_%s_fold_%i_topo_%i.mat',outputpath,class_labels{novelty_class},ifolds,indexTopo),'dnn_representation', 'itrn', 'itst');
             end
         
-            save (sprintf('%s/mat/RunDNNTrainCV_DNN-Representation_novelty_%s_fold_%i_topo_%i.mat',outputpath,class_labels{novelty_class},ifolds,indexTopo),'dnn_representation', 'itrn', 'itst');
+            save (sprintf('%s/mat/RunDNNTrainCV_DNN-Representation_novelty_%s_fold_%i_topo_%i.mat',outputpath,class_labels{novelty_class},ifolds,indexTopo),'dnn_representation', 'itrn', 'itst', 'rbm');
             
         end
     end

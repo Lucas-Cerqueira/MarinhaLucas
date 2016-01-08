@@ -2,7 +2,7 @@
 
 Novelty Detection Package
 
-Contents: --
+Contents: functions, NeuralNetwork, SVM
 
-To do: functions, NeuralNetwork, SVM, DNN
+To do: DNN
 

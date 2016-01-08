@@ -59,7 +59,6 @@ fclose (historyFile);
 trainFolderPath = sprintf ('%s/%s', outputpath, datestr (datetime ('now')));
 mkdir (sprintf ('%s/mat', trainFolderPath));
 mkdir (sprintf ('%s/pict', trainFolderPath));
-disp ('Rodou')
 
 data2train = [];
 target2train = [];

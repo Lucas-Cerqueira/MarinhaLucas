@@ -63,7 +63,9 @@ end
 
 % Train NN procedure
 
-n_folds = 10;
+n_folds = 2;
+
+dbn_sizes = [100:100:1000];
 
 CVO = cvpartition(target2train,'Kfold',n_folds);
 normalization = 'mapminmax';
@@ -105,30 +107,39 @@ for ifolds = 1%:n_folds
  	train_y = target2train_norm(:,itrn)';
  	test_y  = target2train_norm(:,itst)';
 
-
-	% Train a hidden unit DBN and use its weights to initialize a NN
-	rand('state',0)
-	%train dbn
-	dbn.sizes = [400 400];
-	opts.numepochs =   2;
-	%opts.batchsize =    10;
-    %opts.batchsize =    size (train_x,1);
-    opts.batchsize =    7757;
-	opts.momentum  =    0.9;
-	opts.alpha     =    0.1;
-	dbn = dbnsetup(dbn, train_x, opts);
-	dbn = dbntrain(dbn, train_x, opts);
+    erros = [];
     
-	% Unfold DBN to NN
-	nn = dbnunfoldtonn(dbn, 4);
-	nn.activation_function = 'sigm';
+	% Train a hidden unit DBN and use its weights to initialize a NN
+    
+    for i=1:length(dbn_sizes)
+        
+        fprintf ('Training DBN of size %i\n', dbn_sizes(i));
+        
+        rand('state',0)
+        %train dbn
+        dbn.sizes = [dbn_sizes(i)];
+        opts.numepochs =   3;
+        %opts.batchsize =    10;
+        %opts.batchsize =    size (train_x,1);
+        opts.batchsize =    8;
+        opts.momentum  =    0.6;
+        opts.alpha     =    0.01;
+        dbn = dbnsetup(dbn, train_x, opts);
+        dbn = dbntrain(dbn, train_x, opts);
 
-	%train nn
-	opts.numepochs =  50;
-	%opts.batchsize = size (train_x,1);
-    opts.batchsize = 7757;
-	nn = nntrain(nn, train_x, train_y, opts);
-    [er, bad] = nntest(nn, test_x, test_y);
-	[a,b,c,d] = confusion(target2train_norm(:,itst)',sim_nn(nn,data_norm(:,itst)'));
-   	plotconfusion(target2train_norm(:,itst),sim_nn(nn,data_norm(:,itst)')');
+        % Unfold DBN to NN
+        nn = dbnunfoldtonn(dbn, 4);
+        nn.activation_function = 'sigm';
+        nn.learningRate = 1;
+
+        %train nn
+        opts.numepochs =  20;
+        %opts.batchsize = size (train_x,1);
+        opts.batchsize = 8;
+        nn = nntrain(nn, train_x, train_y, opts, test_x, test_y);
+        [er, bad] = nntest(nn, test_x, test_y);
+        [a,b,c,d] = confusion(target2train_norm(:,itst)',sim_nn(nn,data_norm(:,itst)'));
+        
+        erros = [erros er];
+    end
 end
